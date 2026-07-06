@@ -38,22 +38,41 @@ function smtp_send_mail(array $config, string $to, string $subject, string $body
         fwrite($fp, $line . "\r\n");
     };
 
-    fgets($fp, 515);
+    if (!$expect('220')) {
+        fclose($fp);
+        return false;
+    }
+
     $send('EHLO ' . ($_SERVER['SERVER_NAME'] ?? 'localhost'));
-    $expect('250');
+    if (!$expect('250')) {
+        fclose($fp);
+        return false;
+    }
 
     if ($port === 587) {
         $send('STARTTLS');
-        $expect('220');
+        if (!$expect('220')) {
+            fclose($fp);
+            return false;
+        }
         stream_socket_enable_crypto($fp, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
         $send('EHLO ' . ($_SERVER['SERVER_NAME'] ?? 'localhost'));
-        $expect('250');
+        if (!$expect('250')) {
+            fclose($fp);
+            return false;
+        }
     }
 
     $send('AUTH LOGIN');
-    $expect('334');
+    if (!$expect('334')) {
+        fclose($fp);
+        return false;
+    }
     $send(base64_encode($username));
-    $expect('334');
+    if (!$expect('334')) {
+        fclose($fp);
+        return false;
+    }
     $send(base64_encode($password));
     if (!$expect('235')) {
         fclose($fp);
@@ -86,7 +105,9 @@ function smtp_send_mail(array $config, string $to, string $subject, string $body
     $headers[] = 'MIME-Version: 1.0';
     $headers[] = 'Content-Type: text/plain; charset=UTF-8';
 
-    $message = implode("\r\n", $headers) . "\r\n\r\n" . $body . "\r\n.";
+    $normalizedBody = str_replace("\r\n", "\n", $body);
+    $normalizedBody = str_replace("\n", "\r\n", $normalizedBody);
+    $message = implode("\r\n", $headers) . "\r\n\r\n" . $normalizedBody . "\r\n.";
     $send($message);
     $ok = $expect('250');
 
