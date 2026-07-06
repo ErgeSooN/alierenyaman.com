@@ -47,8 +47,8 @@ $site = [
         'tr' => '42 Kocaeli\'nin ilk mezunlarından. Kod yazıyorum, sunucu ayağa kaldırıyorum, topluluk büyütüyorum.',
         'en' => 'One of the first graduates of 42 Kocaeli. I write code, run servers, and grow communities.',
     ],
-    'email'    => 'ay840253@gmail.com',
-    'github'   => 'https://github.com/ergesoon',
+    'email'    => 'mail@alierenyaman.com', 
+        'github'   => 'https://github.com/ergesoon',
     'linkedin' => 'https://www.linkedin.com/in/alierenyaman',
 ];
 
