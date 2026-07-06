@@ -13,6 +13,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Generate SMTP config
+        run: |
+          cat > public_html/includes/smtp-config.php << 'EOF'
+          <?php
+          return [
+              'host' => '${{ secrets.SMTP_HOST }}',
+              'port' => ${{ secrets.SMTP_PORT }},
+              'username' => '${{ secrets.SMTP_USERNAME }}',
+              'password' => '${{ secrets.SMTP_PASSWORD }}',
+              'from' => '${{ secrets.SMTP_USERNAME }}',
+          ];
+          EOF
+
       - name: Sync files via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
